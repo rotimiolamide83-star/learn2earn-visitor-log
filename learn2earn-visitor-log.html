@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn2Earn — Visitor Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B2D4D;
+    --navy-soft:#163A5F;
+    --paper:#F3F6F9;
+    --card:#FFFFFF;
+    --sky:#2F8FD1;
+    --amber:#E8A33D;
+    --green:#2F9E68;
+    --red:#D64550;
+    --ink:#22303F;
+    --ink-soft:#5B6B7A;
+    --line:#D9E3EC;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 10% 0%, rgba(47,143,209,0.08) 0%, transparent 45%),
+      radial-gradient(circle at 100% 100%, rgba(11,45,77,0.06) 0%, transparent 40%),
+      var(--paper);
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:40px 20px 60px;
+  }
+  .wrap{width:100%;max-width:920px;}
+  .top{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:22px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .brand{display:flex;align-items:baseline;gap:10px;}
+  .brand .logo{height:34px;width:auto;display:block;}
+  .brand h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:22px;
+    font-weight:700;
+    color:var(--navy);
+    margin:0;
+    letter-spacing:-0.3px;
+  }
+  .clock{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-soft);}
+
+  .tabs{display:flex;gap:8px;margin-bottom:24px;}
+  .tab{
+    flex:1;
+    text-align:center;
+    padding:13px 10px;
+    border-radius:12px;
+    border:1.5px solid var(--line);
+    background:var(--card);
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    font-size:14.5px;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:all .18s ease;
+    user-select:none;
+  }
+  .tab.active{
+    background:var(--navy);
+    border-color:var(--navy);
+    color:#fff;
+    box-shadow:0 10px 24px rgba(11,45,77,0.22);
+  }
+
+  .grid{display:grid;grid-template-columns:1.35fr 1fr;gap:22px;align-items:start;}
+  @media(max-width:760px){ .grid{grid-template-columns:1fr;} .badge-col{order:-1;} }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:30px;
+    box-shadow:0 18px 45px rgba(15,45,75,0.08);
+  }
+
+  .field{margin-bottom:18px;}
+  .field label{
+    display:block;
+    font-size:13.5px;
+    font-weight:600;
+    color:var(--navy-soft);
+    margin-bottom:7px;
+  }
+  .field label .opt{color:var(--ink-soft);font-weight:400;}
+  .field input[type="text"],
+  .field input[type="tel"],
+  .field input[type="email"],
+  .field input[type="number"]{
+    width:100%;
+    font-family:'Inter',sans-serif;
+    font-size:14.5px;
+    color:var(--ink);
+    background:#fff;
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    padding:12px 13px;
+    outline:none;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .field input:focus{
+    border-color:var(--sky);
+    box-shadow:0 0 0 4px rgba(47,143,209,0.14);
+  }
+  .field input.id-input{
+    font-family:'IBM Plex Mono',monospace;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+  }
+  .radio-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .radio-pill{
+    border:1.5px solid var(--line);
+    border-radius:999px;
+    padding:9px 15px;
+    font-size:13.5px;
+    font-weight:500;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:all .15s ease;
+    user-select:none;
+  }
+  .radio-pill.selected{background:var(--navy);border-color:var(--navy);color:#fff;}
+  .hint{font-size:12px;color:var(--ink-soft);margin-top:6px;}
+  .group-size-field{display:none;}
+  .group-size-field.show{display:block;}
+
+  button.submit{
+    width:100%;
+    margin-top:8px;
+    height:52px;
+    background:var(--navy);
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:15px;
+    font-weight:600;
+    letter-spacing:0.2px;
+    cursor:pointer;
+    box-shadow:0 12px 26px rgba(11,45,77,0.25);
+    transition:background .15s ease, transform .12s ease;
+  }
+  button.submit:hover{background:var(--navy-soft);transform:translateY(-1px);}
+  button.submit:disabled{opacity:0.6;cursor:default;transform:none;}
+
+  .status-msg{
+    margin-top:14px;
+    padding:12px 14px;
+    border-radius:10px;
+    font-size:13.5px;
+    display:none;
+  }
+  .status-msg.show{display:block;}
+  .status-msg.success{background:rgba(47,158,104,0.1);color:var(--green);border:1px solid rgba(47,158,104,0.3);}
+  .status-msg.error{background:rgba(214,69,80,0.1);color:var(--red);border:1px solid rgba(214,69,80,0.3);}
+
+  /* Badge */
+  .badge-col{position:sticky;top:30px;}
+  .badge{
+    background:var(--navy);
+    color:#fff;
+    border-radius:18px;
+    padding:0;
+    overflow:hidden;
+    box-shadow:0 20px 50px rgba(11,45,77,0.3);
+    position:relative;
+  }
+  .badge::before{
+    content:"";
+    position:absolute;
+    top:16px;left:50%;
+    transform:translateX(-50%);
+    width:54px;height:7px;
+    background:rgba(255,255,255,0.18);
+    border-radius:4px;
+  }
+  .badge-inner{padding:44px 26px 26px;}
+  .badge-eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:1.5px;
+    color:rgba(255,255,255,0.55);
+    text-transform:uppercase;
+    margin-bottom:4px;
+  }
+  .badge-org{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;margin-bottom:22px;}
+  .badge-name{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:23px;
+    font-weight:700;
+    line-height:1.2;
+    min-height:29px;
+    word-break:break-word;
+  }
+  .badge-sub{font-size:13px;color:rgba(255,255,255,0.65);margin-top:4px;min-height:18px;}
+  .badge-divider{height:1px;background:rgba(255,255,255,0.15);margin:20px 0;}
+  .badge-row{display:flex;justify-content:space-between;margin-bottom:12px;font-size:12.5px;}
+  .badge-row .k{color:rgba(255,255,255,0.5);}
+  .badge-row .v{font-family:'IBM Plex Mono',monospace;font-weight:500;text-align:right;}
+  .badge-status{
+    margin-top:18px;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.8px;
+    text-transform:uppercase;
+    padding:6px 11px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.12);
+  }
+  .badge-status .dot{width:6px;height:6px;border-radius:50%;background:var(--amber);}
+  .badge-status.checked-in .dot{background:var(--green);}
+  .badge-status.checked-out .dot{background:var(--ink-soft);}
+  .badge-footer{
+    background:rgba(0,0,0,0.15);
+    padding:12px 26px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:1px;
+    color:rgba(255,255,255,0.4);
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="brand">
+      <img class="logo" src="data:image/png;base64,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" alt="Learn2Earn logo">
+      <h1>Learn2Earn Visitor Log</h1>
+    </div>
+    <div class="clock" id="clock"></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-in" onclick="switchTab('in')">Check In</div>
+    <div class="tab" id="tab-out" onclick="switchTab('out')">Check Out</div>
+  </div>
+
+  <div class="grid">
+    <!-- FORM COLUMN -->
+    <div class="card">
+
+      <!-- CHECK IN FORM -->
+      <form id="form-in">
+        <div class="field">
+          <label>Full Name</label>
+          <input type="text" id="in-name" placeholder="e.g. Mr/Mrs/Miss..." required>
+        </div>
+        <div class="field">
+          <label>Address / Company</label>
+          <input type="text" id="in-company" required>
+        </div>
+        <div class="field">
+          <label>Who would you like to see?</label>
+          <input type="text" id="in-person" required>
+        </div>
+        <div class="field">
+          <label>Phone number</label>
+          <input type="tel" id="in-phone" required>
+        </div>
+        <div class="field">
+          <label>Email address <span class="opt">(optional)</span></label>
+          <input type="email" id="in-email">
+        </div>
+        <div class="field">
+          <label>Are you visiting alone or with a group?</label>
+          <div class="radio-row" id="in-alone-group">
+            <div class="radio-pill" data-value="Just Me">Just Me</div>
+            <div class="radio-pill" data-value="With a Group">With a Group</div>
+          </div>
+        </div>
+        <div class="field group-size-field" id="in-group-size-wrap">
+          <label>Group Size</label>
+          <input type="number" id="in-group-size" min="1">
+        </div>
+        <div class="field">
+          <label>Purpose of visit</label>
+          <div class="radio-row" id="in-purpose">
+            <div class="radio-pill" data-value="Meeting">Meeting</div>
+            <div class="radio-pill" data-value="Interview">Interview</div>
+            <div class="radio-pill" data-value="Training">Training</div>
+            <div class="radio-pill" data-value="Delivery">Delivery</div>
+            <div class="radio-pill" data-value="Other">Other</div>
+          </div>
+        </div>
+        <div class="hint">Your arrival time is recorded automatically. You'll receive a Visitor ID below - keep it, you'll need it to check out.</div>
+        <button class="submit" type="submit" id="in-submit-btn">Check In</button>
+        <div class="status-msg" id="in-status"></div>
+      </form>
+
+      <!-- CHECK OUT FORM -->
+      <form id="form-out" style="display:none;">
+        <div class="field">
+          <label>Visitor ID</label>
+          <input type="text" id="out-id" class="id-input" placeholder="e.g. VIS-10223" required>
+        </div>
+        <div class="hint">This is the ID you were given when you checked in. We'll use it to log your checkout time automatically.</div>
+        <button class="submit" type="submit" id="out-submit-btn">Check Out</button>
+        <div class="status-msg" id="out-status"></div>
+      </form>
+
+    </div>
+
+    <!-- BADGE COLUMN -->
+    <div class="badge-col">
+      <div class="badge">
+        <div class="badge-inner">
+          <div class="badge-eyebrow">Visitor Pass</div>
+          <div class="badge-org">Learn2Earn</div>
+          <div class="badge-name" id="badge-name">Your name</div>
+          <div class="badge-sub" id="badge-company">Company / affiliation</div>
+          <div class="badge-divider"></div>
+          <div class="badge-row"><span class="k">Visiting</span><span class="v" id="badge-person">—</span></div>
+          <div class="badge-row"><span class="k">Purpose</span><span class="v" id="badge-purpose">—</span></div>
+          <div class="badge-row"><span class="k">Date</span><span class="v" id="badge-date">—</span></div>
+          <div class="badge-status" id="badge-status"><span class="dot"></span><span id="badge-status-text">Awaiting</span></div>
+        </div>
+        <div class="badge-footer" id="badge-footer">VISITOR ID PENDING</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ====== CONFIGURE THESE with your n8n production webhook URLs ====== */
+const CHECKIN_URL  = "https://milaaa001.app.n8n.cloud/webhook/visitor-checkin"
+const CHECKOUT_URL = "https://milaaa001.app.n8n.cloud/webhook/visitor-checkout";
+/* ===================================================================== */
+
+// live clock
+function updateClock(){
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleString('en-US', {
+    weekday:'short', month:'short', day:'numeric',
+    hour:'2-digit', minute:'2-digit'
+  });
+}
+updateClock();
+setInterval(updateClock, 1000 * 30);
+
+// tabs
+function switchTab(which){
+  document.getElementById('tab-in').classList.toggle('active', which==='in');
+  document.getElementById('tab-out').classList.toggle('active', which==='out');
+  document.getElementById('form-in').style.display = which==='in' ? 'block' : 'none';
+  document.getElementById('form-out').style.display = which==='out' ? 'block' : 'none';
+  document.getElementById('badge-status-text').textContent = which==='in' ? 'Awaiting' : 'Checking out';
+}
+
+// radio pill helper
+function wirePills(containerId, onChange){
+  const container = document.getElementById(containerId);
+  let selected = null;
+  container.querySelectorAll('.radio-pill').forEach(pill=>{
+    pill.addEventListener('click', ()=>{
+      container.querySelectorAll('.radio-pill').forEach(p=>p.classList.remove('selected'));
+      pill.classList.add('selected');
+      selected = pill.dataset.value;
+      onChange(selected);
+    });
+  });
+  return { get: ()=>selected };
+}
+
+const aloneGroup = wirePills('in-alone-group', (val)=>{
+  document.getElementById('in-group-size-wrap').classList.toggle('show', val === 'With a Group');
+});
+const purpose = wirePills('in-purpose', (val)=>{
+  document.getElementById('badge-purpose').textContent = val;
+});
+
+// live badge preview
+function refreshBadge(){
+  const name = document.getElementById('in-name').value.trim();
+  const company = document.getElementById('in-company').value.trim();
+  const person = document.getElementById('in-person').value.trim();
+  document.getElementById('badge-name').textContent = name || 'Your name';
+  document.getElementById('badge-company').textContent = company || 'Company / affiliation';
+  document.getElementById('badge-person').textContent = person || '—';
+  document.getElementById('badge-date').textContent = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+}
+['in-name','in-company','in-person'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', refreshBadge);
+});
+refreshBadge();
+
+function showStatus(el, kind, message){
+  el.textContent = message;
+  el.className = 'status-msg show ' + kind;
+}
+
+// CHECK IN submit
+document.getElementById('form-in').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const btn = document.getElementById('in-submit-btn');
+  const statusEl = document.getElementById('in-status');
+
+  const groupChoice = aloneGroup.get() || "Just Me";
+  const purposeChoice = purpose.get();
+
+  if(!purposeChoice){
+    showStatus(statusEl, 'error', 'Please select a purpose of visit.');
+    return;
+  }
+
+  // NOTE: Time In and Visitor ID are NOT sent from here - n8n generates both
+  // server-side, so we don't rely on the visitor's device clock.
+  const payload = {
+    "Full Name": document.getElementById('in-name').value.trim(),
+    "Address/Company": document.getElementById('in-company').value.trim(),
+    "Who would you like to see?": document.getElementById('in-person').value.trim(),
+    "Phone Number": document.getElementById('in-phone').value.trim(),
+    "Email Address": document.getElementById('in-email').value.trim(),
+    "Visiting Alone or Group": groupChoice,
+    "Group Size": groupChoice === "With a Group" ? (document.getElementById('in-group-size').value || 1) : 1,
+    "Purpose of Visit": purposeChoice
+  };
+
+  btn.disabled = true; btn.textContent = 'Checking in…';
+  try{
+    const res = await fetch(CHECKIN_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if(res.ok){
+      showStatus(statusEl, 'success', data.message || 'Checked in successfully.');
+      document.getElementById('badge-status').className = 'badge-status checked-in';
+      document.getElementById('badge-status-text').textContent = 'Checked In';
+      document.getElementById('badge-footer').textContent = 'ID: ' + (data.visitor_id || '—');
+      e.target.reset();
+      document.querySelectorAll('#in-alone-group .radio-pill, #in-purpose .radio-pill').forEach(p=>p.classList.remove('selected'));
+      document.getElementById('in-group-size-wrap').classList.remove('show');
+      refreshBadge();
+    } else {
+      showStatus(statusEl, 'error', data.message || 'Something went wrong. Please try again.');
+    }
+  } catch(err){
+    showStatus(statusEl, 'error', 'Could not reach the server. Check your connection and try again.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Check In';
+  }
+});
+
+// CHECK OUT submit
+document.getElementById('form-out').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const btn = document.getElementById('out-submit-btn');
+  const statusEl = document.getElementById('out-status');
+
+  const payload = {
+    "Visitor ID": document.getElementById('out-id').value.trim().toUpperCase()
+  };
+
+  btn.disabled = true; btn.textContent = 'Checking out…';
+  try{
+    const res = await fetch(CHECKOUT_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if(res.ok){
+      showStatus(statusEl, 'success', data.message || 'Checked out successfully.');
+      document.getElementById('badge-status').className = 'badge-status checked-out';
+      document.getElementById('badge-status-text').textContent = 'Checked Out';
+      document.getElementById('badge-footer').textContent = (data.time_out ? 'OUT ' + data.time_out : 'CHECKED OUT') + (data.duration ? ' · ' + data.duration : '');
+      e.target.reset();
+    } else {
+      showStatus(statusEl, 'error', data.message || 'No matching check-in record found for that Visitor ID.');
+    }
+  } catch(err){
+    showStatus(statusEl, 'error', 'Could not reach the server. Check your connection and try again.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Check Out';
+  }
+});
+</script>
+</body>
+</html>
